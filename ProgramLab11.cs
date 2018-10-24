@@ -20,7 +20,7 @@ namespace Lab11
         {
             Console.Clear();
             Console.WriteLine("Welcome to the Movie List Application!");
-            Console.WriteLine($"There are {count} movies in this list.\n");
+            Console.WriteLine($"There are {count} movies in this list...\n");
         }
 
         public static void MainMenu(List<Movie> movieList)
@@ -28,6 +28,7 @@ namespace Lab11
             bool retry = true;
             while (retry)
             {
+                bool invalid = false;
                 Header(movieList.Count);
                 
                 List<Menu> menu = new List<Menu>()
@@ -51,10 +52,14 @@ namespace Lab11
                 }
                 else
                 {
-                    Invalid();
+                    invalid = true;
                 }
-                Console.Write("\n\nContinue? (y/n)  ");
-                retry = Retry();
+
+                if (!invalid)
+                {
+                    Console.Write("\n\nContinue to Main Menu? (y/n)  ");
+                    retry = Retry();
+                }
             }
         }
 
@@ -88,56 +93,67 @@ namespace Lab11
                 string title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Console.ReadLine());
                 movieList.Add(new Movie(genre, title));
 
-                Console.Write("Enter Another Movie? (y/n)  ");
+                Console.Write("\nEnter Another Movie? (y/n)  ");
                 retry = Retry();
             }
             return movieList;
         }
 
         public static void Genres(List<Movie> movieList)
-        {         
-            Console.Clear();
-            List<string> genres = new List<string>();
-            foreach (Movie movie in movieList)//put all genres into list
+        {
+            bool retry = true;
+            while (retry)
             {
-                genres.Add(movie.Genre);             
-            }
-            List<string> menu = genres.Distinct().ToList();//remove duplicates
-            menu.Sort();//alphabetize
-
-            int menuCount = 0;
-            Console.WriteLine($"There are {menu.Count} total genres...\n");//display menu
-            foreach (string nav in menu)
-            {
-                menuCount += 1;
-                Console.WriteLine(menuCount + " - " + nav);
-            }
-            
-            Console.Write("\nChoose a Genre:  (enter number)  ");//get user selection
-            int.TryParse(Console.ReadLine(), out int entry);
-            if (entry > 0 && entry <= menu.Count)
-            {
-                List<string> display = new List<string>();
-                string select = menu[entry - 1];
-                Console.Clear();          
-                foreach (Movie movie in movieList)
+                bool invalid = false;
+                Console.Clear();
+                List<string> genres = new List<string>();
+                foreach (Movie movie in movieList)//put all genres into list
                 {
-                    if (Equals(select, movie.Genre))
+                    genres.Add(movie.Genre);             
+                }
+                List<string> menu = genres.Distinct().ToList();//remove duplicates
+                menu.Sort();//alphabetize
+
+                int menuCount = 0;
+                Console.WriteLine($"There are {menu.Count} total genres...\n");//display menu
+                foreach (string nav in menu)
+                {
+                    menuCount += 1;
+                    Console.WriteLine(menuCount + " - " + nav);
+                }
+            
+                Console.Write("\nChoose a Genre:  (enter number)  ");//get user selection
+                int.TryParse(Console.ReadLine(), out int entry);
+                if (entry > 0 && entry <= menu.Count)
+                {
+                    List<string> display = new List<string>();
+                    string select = menu[entry - 1];
+                    Console.Clear();          
+                    foreach (Movie movie in movieList)
                     {
-                        display.Add(movie.Title);
+                        if (Equals(select, movie.Genre))
+                        {
+                            display.Add(movie.Title);
+                        }
+                    }
+                    Console.WriteLine($"There are {display.Count} movies in the {select} genre...\n");
+                    display.Sort();
+                    foreach(string title in display)
+                    {
+                        Console.WriteLine(title);
                     }
                 }
-                Console.WriteLine($"There are {display.Count} movies in the {select} genre...\n");
-                display.Sort();
-                foreach(string title in display)
+                else
                 {
-                    Console.WriteLine(title);
+                    invalid = true;
                 }
-            }
-            else
-            {
-                Invalid();
-            }       
+
+                if (!invalid)
+                {
+                    Console.Write("\n\nChoose a different genre? (y/n)  ");
+                    retry = Retry();
+                }
+            }     
         }
 
         public static void Titles(List<Movie> movieList)
@@ -153,11 +169,6 @@ namespace Lab11
             {
                 Console.WriteLine(title);
             }
-        }
-
-        public static void Invalid()
-        {
-            Console.WriteLine("Invalid Entry");
         }
 
         public static bool Retry()
@@ -180,8 +191,9 @@ namespace Lab11
                 }
                 else
                 {
+                    Console.Write("\nInvalid Entry, Try Again! Return to Previous Menu?  (y/n)  ");
                     valid = false;
-                    retry = false;
+                    retry = true;
                 }
             }
             return retry;
