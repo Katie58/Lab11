@@ -201,10 +201,12 @@ namespace Lab11
 
         public static void Exit()
         {
+            ConsoleKey key = Console.ReadKey().Key;
+
             Console.Write("\nGoodbye! Press ESCAPE to Exit...");
             while (Console.ReadKey().Key != ConsoleKey.Escape)
             {
-                Exit();
+                key = Console.ReadKey().Key;
             }
         }
     }
